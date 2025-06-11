@@ -1,0 +1,167 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+---
+
+<Layout>
+  <div
+    class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-100 absolute inset-0 m-auto h-fit"
+  >
+    <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-8">
+      Login
+    </h1>
+
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+          Email address
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          class="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition duration-150 ease-in-out"
+          placeholder="you@example.com"
+        />
+      </div>
+
+      <div>
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          class="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition duration-150 ease-in-out"
+          placeholder="••••••••"
+        />
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+          />
+          <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+            Remember me
+          </label>
+        </div>
+
+        <div class="text-sm">
+          <a href="#" class="font-medium text-purple-600 hover:text-purple-500">
+            Forgot your password?
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out"
+        >
+          Sign in
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-8 text-center text-sm text-gray-600">
+      Don't have an account?
+      <a href="#" class="font-medium text-purple-600 hover:text-purple-500">
+        Sign up
+      </a>
+    </p>
+  </div>
+
+    <script>
+         function setCookie(name: string, value: string, days: number) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = `; expires=${date.toUTCString()}`;
+            }
+            // In a real application, you would also add `Secure; HttpOnly; SameSite=Lax`
+            // Example for production: document.cookie = `${name}=${value}${expires}; path=/; Secure; HttpOnly; SameSite=Lax`;
+            document.cookie = `${name}=${value}${expires}; path=/`;
+            console.log(`Cookie "${name}" set: ${value}`);
+        }
+
+        function handleLoginSubmit(event: Event) {
+            event.preventDefault();
+
+            const form = event.target as HTMLFormElement;
+            const formData = new FormData(form);
+            const email = formData.get('email');
+            const password = formData.get('password');
+            const rememberMe = formData.get('remember-me') === 'on';
+
+            // Simulate authentication logic
+            // In a real app, this would be a fetch() call to your backend
+            if (email === 'user@example.com' && password === 'password123') {
+                displayMessage('Login successful! Generating tokens...', false);
+
+                const { mockAccessToken, mockRefreshToken } = generateMockTokens(email);
+
+                // Set access token cookie (e.g., expires in 1 hour)
+                setCookie('accessToken', mockAccessToken, 1/24); // 1 hour
+
+                // Set refresh token cookie (e.g., expires in 7 days)
+                setCookie('refreshToken', mockRefreshToken, 7);
+
+                console.log('Access Token:', mockAccessToken);
+                console.log('Refresh Token:', mockRefreshToken);
+                console.log('Cookies set. Check your browser\'s developer tools under Application -> Cookies.');
+
+                // Redirect or update UI after successful login
+                Example: window.location.href = '/';
+            } else {
+                displayMessage('Invalid email or password.', true);
+                console.error('Login failed: Invalid credentials');
+            }
+        }
+
+         function generateMockTokens(username:string) {
+            // Mock JWT Header: {"alg": "HS256", "typ": "JWT"}
+            const header = btoa(JSON.stringify({ "alg": "HS256", "typ": "JWT" }));
+            // Mock JWT Payload: { "sub": "1234567890", "name": "John Doe", "iat": 1516239022 }
+            const payload = btoa(JSON.stringify({ "sub": "1234567890", "name": username, "iat": Math.floor(Date.now() / 1000) }));
+            // A mock signature (not truly signed, just for demonstration of JWT structure)
+            const signature = btoa('mock-signature');
+
+            const mockAccessToken = `${header}.${payload}.${signature}`;
+            const mockRefreshToken = `refresh_${crypto.randomUUID()}`; // Generate a random refresh token
+
+            return { mockAccessToken, mockRefreshToken };
+        }
+
+           function displayMessage(message: string | null, isError: boolean) {
+            const messageBox = document.getElementById('messageBox');
+            if (messageBox) {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                if (isError) {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                } else {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                }
+            }
+        }
+
+         const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLoginSubmit);
+        }
+
+    </script>
+</Layout>
