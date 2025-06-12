@@ -153,7 +153,6 @@ function prepareHeaders(options: RequestInit, accessToken: string): Headers {
 
   // Only set Content-Type if not already set and body exists
   if (!headers.has("Content-Type") && options.body) {
-    // Let browser handle Content-Type for FormData, Blob, etc.
     const needsJsonContentType =
       typeof options.body === "string" ||
       options.body instanceof URLSearchParams;
