@@ -1,0 +1,24 @@
+---
+import type { Post } from '../pages/blog.astro';
+
+interface Props {
+  post: Post
+}
+const { post } = Astro.props;
+
+---
+
+<div
+  class="bg-white shadow-lg p-6 rounded-xl hover:shadow-lg flex flex-col justify-between hover:scale-110 transition duration-200 ease-in-out"
+>
+  <h2 class="text-xl font-semibold text-gray-800 mb-3 capitalize">
+    {post.title}
+  </h2>
+  <p class="text-gray-600 text-sm mb-4 line-clamp-3">{post.body}</p>
+  <a
+    href={`/blog/${post.id}`}
+    class="text-blue-600 hover:text-blue-800 font-medium text-sm self-end"
+  >
+    Read full post &rarr;
+  </a>
+</div>

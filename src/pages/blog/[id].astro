@@ -1,0 +1,52 @@
+---
+import LikeSection from "../../components/LikeSection";
+import Layout from "../../layouts/Layout.astro";
+import "../../styles/global.css";
+const { id } = Astro.params;
+let error = null;
+let dataPost = null;
+try {
+  dataPost = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${id}`
+  ).then((res) => res.json());
+} catch (err) {
+  console.error("Failed to fetch blog post:", err);
+  error = "Failed to load post.";
+}
+---
+
+<Layout title={dataPost?.title || "Blog Post"}>
+  {error ? (
+    <p class="max-w-3xl mx-auto bg-red-100 p-8 rounded-xl shadow-2xl my-8 border border-red-300">
+      {error}
+    </p>
+  ) : (
+    <div
+      class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl my-8 border border-gray-100"
+    >
+      <a
+        href="/blog"
+        class="text-blue-600 hover:text-blue-800 font-medium text-sm"
+      >
+        Back
+      </a>
+      <h1
+        class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-6 capitalize"
+      >
+        {dataPost?.title}
+      </h1>
+
+      <p
+        class="text-base sm:text-lg text-gray-700 leading-relaxed"
+      >
+        {dataPost?.body}
+      </p>
+
+      <p class="text-sm text-gray-500 mt-8 text-right">
+        Post ID: {dataPost?.id}
+      </p>
+      <LikeSection client:load />
+    </div>
+  )}
+</Layout>
+
